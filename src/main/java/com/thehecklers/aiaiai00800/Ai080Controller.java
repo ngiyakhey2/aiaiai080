@@ -3,6 +3,7 @@ package com.thehecklers.aiaiai00800;
 import org.springframework.ai.azure.openai.AzureOpenAiChatClient;
 import org.springframework.ai.chat.ChatResponse;
 import org.springframework.ai.prompt.Prompt;
+import org.springframework.ai.prompt.PromptTemplate;
 import org.springframework.ai.prompt.messages.ChatMessage;
 import org.springframework.ai.prompt.messages.Message;
 import org.springframework.ai.prompt.messages.MessageType;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class Ai080Controller {
@@ -38,5 +40,12 @@ public class Ai080Controller {
             buffer.add(g);
         });
         return response;
+    }
+
+    @GetMapping("/template")
+    public String generate(@RequestParam String typeOfRequest, @RequestParam String topicOfRequest) {
+        PromptTemplate template = new PromptTemplate("Tell me a {type} about {topic}");
+        Prompt prompt = template.create(Map.of("type", typeOfRequest, "topic", topicOfRequest));
+        return chatClient.generate(prompt).getGeneration().getContent();
     }
 }
