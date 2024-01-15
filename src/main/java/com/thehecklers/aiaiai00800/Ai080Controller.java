@@ -2,8 +2,10 @@ package com.thehecklers.aiaiai00800;
 
 import org.springframework.ai.azure.openai.AzureOpenAiChatClient;
 import org.springframework.ai.chat.ChatResponse;
+import org.springframework.ai.chat.Generation;
 import org.springframework.ai.prompt.Prompt;
 import org.springframework.ai.prompt.PromptTemplate;
+import org.springframework.ai.prompt.SystemPromptTemplate;
 import org.springframework.ai.prompt.messages.ChatMessage;
 import org.springframework.ai.prompt.messages.Message;
 import org.springframework.ai.prompt.messages.MessageType;
@@ -26,24 +28,34 @@ public class Ai080Controller {
     }
 
     @GetMapping
-    public ChatResponse generate(@RequestParam(defaultValue = "Tell me a joke") String message) {
+    public ChatResponse generate(@RequestParam(defaultValue = "Tell me a joke") String message,
+                                 @RequestParam(required = false) String celebrity) {
         List<Message> promptMessages = new ArrayList<>();
         promptMessages.addAll(buffer);
+
+        // Add the user's message
         promptMessages.add(new ChatMessage(MessageType.ASSISTANT, message));
+
+        if (null != celebrity) {
+            // Add a system message to guide the AI's generation
+            var sysTemplate = new SystemPromptTemplate("You respond in the style of {celebrity}.");
+            Message sysMessage = sysTemplate.createMessage(Map.of("celebrity", celebrity));
+            promptMessages.add(sysMessage);
+        }
 
         ChatResponse response = chatClient.generate(new Prompt(promptMessages));
         response.getGenerations().forEach(g -> {
-            System.out.println(">> Message Type:");
-            System.out.println(g.getMessageType());
-            System.out.println(">> Content:");
-            System.out.println(g.getContent());
+            System.out.println("   Message Request: " + message);
+            System.out.println("   Celebrity Voice: " + celebrity);
+            System.out.println("   Content:");
+            System.out.println("   " + g.getContent());
             buffer.add(g);
         });
         return response;
     }
 
     @GetMapping("/template")
-    public String generate(@RequestParam String typeOfRequest, @RequestParam String topicOfRequest) {
+    public String generateUsingTemplate(@RequestParam String typeOfRequest, @RequestParam String topicOfRequest) {
         PromptTemplate template = new PromptTemplate("Tell me a {type} about {topic}");
         Prompt prompt = template.create(Map.of("type", typeOfRequest, "topic", topicOfRequest));
         return chatClient.generate(prompt).getGeneration().getContent();
