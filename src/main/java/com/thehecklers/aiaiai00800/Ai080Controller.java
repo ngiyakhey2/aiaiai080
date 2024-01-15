@@ -34,7 +34,7 @@ public class Ai080Controller {
         promptMessages.addAll(buffer);
 
         // Add the user's message
-        promptMessages.add(new ChatMessage(MessageType.ASSISTANT, message));
+        promptMessages.add(new ChatMessage(MessageType.USER, message));
 
         if (null != celebrity) {
             // Add a system message to guide the AI's generation
