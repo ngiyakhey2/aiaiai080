@@ -2,7 +2,6 @@ package com.thehecklers.aiaiai00800;
 
 import org.springframework.ai.azure.openai.AzureOpenAiChatClient;
 import org.springframework.ai.chat.ChatResponse;
-import org.springframework.ai.chat.Generation;
 import org.springframework.ai.prompt.Prompt;
 import org.springframework.ai.prompt.PromptTemplate;
 import org.springframework.ai.prompt.SystemPromptTemplate;
