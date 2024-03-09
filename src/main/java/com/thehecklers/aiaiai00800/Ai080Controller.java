@@ -3,11 +3,7 @@ package com.thehecklers.aiaiai00800;
 import org.springframework.ai.azure.openai.AzureOpenAiChatClient;
 import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
 import org.springframework.ai.chat.ChatResponse;
-//import org.springframework.ai.prompt.PromptTemplate;
-import org.springframework.ai.chat.messages.ChatMessage;
-import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.MessageType;
-import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.messages.*;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
@@ -65,12 +61,23 @@ public class Ai080Controller {
 
     @GetMapping("/weather")
     public String generateWeather(@RequestParam String location) {
-//        PromptTemplate template = new PromptTemplate("What's the weather like in {location}?");
-//        Prompt prompt = template.create(Map.of("location", location));
-//        return chatClient.call(prompt).getResult().getOutput().getContent();
-
         return chatClient.call(new Prompt(new UserMessage("What is the weather in " + location), AzureOpenAiChatOptions.builder()
                         .withFunction("weatherFunction").build()))
+                .getResult()
+                .getOutput()
+                .getContent();
+    }
+
+    @GetMapping("/about")
+    public String generateAbout(@RequestParam(defaultValue = "What are some recommended activities?") String message, @RequestParam(defaultValue = "Chicago") String location) {
+        AssistantMessage assistantMessage = chatClient.call(new Prompt(new UserMessage("What is the weather in " + location), AzureOpenAiChatOptions.builder()
+                        .withFunction("weatherFunction").build()))
+                .getResult()
+                .getOutput();
+
+        PromptTemplate template = new PromptTemplate("{message} in {location}?");
+        Message userMessage = template.createMessage(Map.of("message", message, "location", location));
+        return chatClient.call(new Prompt(List.of(assistantMessage, userMessage)))
                 .getResult()
                 .getOutput()
                 .getContent();

@@ -2,7 +2,6 @@ package com.thehecklers.aiaiai00800;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-//public record Response(double temp, WeatherService.Unit unit) {
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record Response(int cloud_pct,
                        double temp,
