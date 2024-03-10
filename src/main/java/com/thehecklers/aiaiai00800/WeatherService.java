@@ -5,7 +5,7 @@ import org.springframework.web.client.RestClient;
 
 import java.util.function.Function;
 
-public class WeatherService implements Function<Request, Response> {
+public class WeatherService implements Function<WxRequest, WxResponse> {
     @Value("${weather.key:No valid key}")
     private String key;
 
@@ -30,12 +30,12 @@ public class WeatherService implements Function<Request, Response> {
             "sunset": 1709949892
     }*/
 
-    public Response apply(Request request) {
+    public WxResponse apply(WxRequest request) {
         return client.get()
                 .uri(url + "?city=" + request.location())
                 .header("X-RapidAPI-Key", key)
                 .header("X-RapidAPI-Host", host)
                 .retrieve()
-                .body(Response.class);
+                .body(WxResponse.class);
     }
 }

@@ -10,7 +10,7 @@ import java.util.function.Function;
 public class Ai080Config {
     @Bean
     @Description("What is the weather in location")
-    public Function<Request, Response> weatherFunction() {
+    public Function<WxRequest, WxResponse> weatherFunction() {
         return new WeatherService();
     }
 }

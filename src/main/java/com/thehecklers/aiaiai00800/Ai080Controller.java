@@ -28,8 +28,7 @@ public class Ai080Controller {
     @GetMapping
     public ChatResponse generate(@RequestParam(defaultValue = "Tell me a joke") String message,
                                  @RequestParam(required = false) String celebrity) {
-        List<Message> promptMessages = new ArrayList<>();
-        promptMessages.addAll(buffer);
+        List<Message> promptMessages = new ArrayList<>(buffer);
 
         // Add the user's message
         promptMessages.add(new ChatMessage(MessageType.USER, message));
@@ -42,6 +41,8 @@ public class Ai080Controller {
         }
 
         ChatResponse response = chatClient.call(new Prompt(promptMessages));
+/*
+        //Use this in cases where you wish/need to request multiple generations
         response.getResults().forEach(g -> {
             System.out.println("   Message Request: " + message);
             System.out.println("   Celebrity Voice: " + celebrity);
@@ -49,6 +50,8 @@ public class Ai080Controller {
             System.out.println("   " + g.getOutput().getContent());
             buffer.add(g.getOutput());
         });
+*/
+        buffer.add(response.getResult().getOutput());
         return response;
     }
 
@@ -73,7 +76,7 @@ public class Ai080Controller {
 
         PromptTemplate template = new PromptTemplate("{message} in {location}?");
         Message userMessage = template.createMessage(Map.of("message", message, "location", location));
-        
+
         return chatClient.call(new Prompt(List.of(assistantMessage, userMessage)))
                 .getResult()
                 .getOutput()
