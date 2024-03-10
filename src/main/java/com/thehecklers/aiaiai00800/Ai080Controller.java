@@ -60,23 +60,20 @@ public class Ai080Controller {
     }
 
     @GetMapping("/weather")
-    public String generateWeather(@RequestParam String location) {
+    public AssistantMessage generateWeather(@RequestParam(defaultValue = "New York City") String location) {
         return chatClient.call(new Prompt(new UserMessage("What is the weather in " + location), AzureOpenAiChatOptions.builder()
                         .withFunction("weatherFunction").build()))
                 .getResult()
-                .getOutput()
-                .getContent();
+                .getOutput();
     }
 
     @GetMapping("/about")
     public String generateAbout(@RequestParam(defaultValue = "What are some recommended activities?") String message, @RequestParam(defaultValue = "Chicago") String location) {
-        AssistantMessage assistantMessage = chatClient.call(new Prompt(new UserMessage("What is the weather in " + location), AzureOpenAiChatOptions.builder()
-                        .withFunction("weatherFunction").build()))
-                .getResult()
-                .getOutput();
+        var assistantMessage = generateWeather(location);
 
         PromptTemplate template = new PromptTemplate("{message} in {location}?");
         Message userMessage = template.createMessage(Map.of("message", message, "location", location));
+        
         return chatClient.call(new Prompt(List.of(assistantMessage, userMessage)))
                 .getResult()
                 .getOutput()
